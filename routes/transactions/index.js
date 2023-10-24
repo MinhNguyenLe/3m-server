@@ -4,10 +4,8 @@ const express = require("express");
 
 const routerTransaction = express.Router();
 
-function defineMatchByIsProduction(isProduction) {
-  console.log("is production", process.env.PRODUCTION)
-  if (process.env.PRODUCTION || isProduction === true || isProduction === "true") return { $match: { isProduction: true } }
-  return { $match: {} }
+function defineMatchByIsProduction() {
+  return { $match: { isProduction: true } }
 }
 
 // routerTransaction.post("/submit-data-from-local-to-cluster", async (req, res) => {
@@ -232,7 +230,7 @@ routerTransaction.post("/create", async function (req, res) {
   try {
     console.log("🔥 transactions/create DEBUGGER ->>> ", req.body)
 
-    const { type, label, userCode, isProduction } = req.body;
+    const { type, label, userCode } = req.body;
 
     if (!type) {
       res.status(404).send({ message: "Missing key type" });
@@ -255,10 +253,8 @@ routerTransaction.post("/create", async function (req, res) {
       res.status(404).send({ message: "User not found" });
     }
 
-    const formattedIsProduction = isProduction === "false" ? false : isProduction === "true" ? true : !!isProduction
-
-    const test = await db.collection("transactions").insertOne(
-      { isProduction: formattedIsProduction, type, label: { ...label, date: new Date(label?.date) }, createdAt: new Date(), userId: user._id });
+    await db.collection("transactions").insertOne(
+      { isProduction: true, type, label: { ...label, date: new Date(label?.date) }, createdAt: new Date(), userId: user._id });
 
     res.status(200).json({ message: "Create new transaction successful" });
   } catch (error) {
