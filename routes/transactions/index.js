@@ -5,6 +5,7 @@ const express = require("express");
 const routerTransaction = express.Router();
 
 function defineMatchByIsProduction(isProduction) {
+  console.log("is production", process.env.PRODUCTION)
   if (process.env.PRODUCTION || isProduction === true || isProduction === "true") return { $match: { isProduction: true } }
   return { $match: {} }
 }
